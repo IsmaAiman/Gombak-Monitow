@@ -1,0 +1,339 @@
+{
+  "parlimen": {
+    "code": "P.098",
+    "name": "Gombak"
+  },
+  "google_news": {
+    "hl": "ms",
+    "gl": "MY",
+    "ceid": "MY:ms"
+  },
+  "max_age_days": 7,
+  "per_query_limit": 10,
+  "max_new_per_run": 120,
+  "batch_size": 15,
+  "request_delay_seconds": 1.0,
+  "send_empty_digest": false,
+  "extra_queries": [
+    "\"Parlimen Gombak\"",
+    "\"Pejabat Daerah Gombak\"",
+    "\"Majlis Perbandaran Selayang\"",
+    "\"MPAJ\" (Hulu Kelang OR Keramat OR Melawati)",
+    "Gombak Selangor",
+    "Gombak banjir OR \"tanah runtuh\" OR kemalangan"
+  ],
+  "categories": [
+    {
+      "key": "aktiviti_wakil_rakyat",
+      "label": "Aktiviti wakil rakyat/kerajaan",
+      "desc": "program, lawatan, penyampaian bantuan, mesyuarat rasmi oleh wakil rakyat, agensi atau kerajaan"
+    },
+    {
+      "key": "isu_komuniti",
+      "label": "Isu komuniti",
+      "desc": "aduan atau masalah penduduk: banjir, jalan rosak, sampah, bekalan air/elektrik, keselamatan, perumahan"
+    },
+    {
+      "key": "projek_dasar",
+      "label": "Projek & pengumuman",
+      "desc": "pembangunan, infrastruktur, dasar, kelulusan, tender, pengumuman rasmi"
+    },
+    {
+      "key": "insiden",
+      "label": "Insiden",
+      "desc": "kemalangan, kebakaran, jenayah, tanah runtuh, kecemasan"
+    },
+    {
+      "key": "politik",
+      "label": "Politik & pilihan raya",
+      "desc": "aktiviti parti, kenyataan politik, pencalonan, pilihan raya"
+    },
+    {
+      "key": "acara_komuniti",
+      "label": "Acara komuniti",
+      "desc": "festival, sukan, keagamaan, pendidikan, gotong-royong, program sosial"
+    },
+    {
+      "key": "lain",
+      "label": "Lain-lain",
+      "desc": "berkaitan kawasan tetapi tidak sesuai kategori di atas"
+    }
+  ],
+  "duns": [
+    {
+      "code": "098/16",
+      "name": "Sungai Tua",
+      "aliases": [
+        "Batu Caves"
+      ],
+      "queries": [
+        "\"Sungai Tua\" Gombak"
+      ],
+      "pdm": [
+        {
+          "code": "098/16/01",
+          "name": "Wira Damai",
+          "context": "Batu Caves OR Selayang OR Gombak"
+        },
+        {
+          "code": "098/16/02",
+          "name": "Taman Jasa",
+          "context": "Batu Caves OR Selayang OR Gombak"
+        },
+        {
+          "code": "098/16/03",
+          "name": "Sungai Tua",
+          "queries": []
+        },
+        {
+          "code": "098/16/04",
+          "name": "Kampung Nakhoda"
+        },
+        {
+          "code": "098/16/05",
+          "name": "Kampung Laksamana"
+        },
+        {
+          "code": "098/16/06",
+          "name": "Selayang Baharu Empat",
+          "queries": [
+            "\"Selayang Baharu\""
+          ]
+        },
+        {
+          "code": "098/16/07",
+          "name": "Selayang Baharu Lima",
+          "queries": []
+        },
+        {
+          "code": "098/16/08",
+          "name": "Taman Selayang"
+        },
+        {
+          "code": "098/16/09",
+          "name": "Taman Batu Caves"
+        },
+        {
+          "code": "098/16/10",
+          "name": "Pekan Batu Caves Lama",
+          "queries": [
+            "\"Pekan Batu Caves\""
+          ]
+        },
+        {
+          "code": "098/16/11",
+          "name": "Batu Caves",
+          "queries": [
+            "\"Batu Caves\""
+          ]
+        },
+        {
+          "code": "098/16/12",
+          "name": "Batu 8 Sungai Tua",
+          "queries": [
+            "\"Batu 8\" \"Sungai Tua\""
+          ]
+        }
+      ]
+    },
+    {
+      "code": "098/17",
+      "name": "Gombak Setia",
+      "aliases": [],
+      "queries": [
+        "\"Gombak Setia\""
+      ],
+      "pdm": [
+        {
+          "code": "098/17/01",
+          "name": "Sri Gombak 9",
+          "queries": [
+            "\"Sri Gombak\""
+          ]
+        },
+        {
+          "code": "098/17/02",
+          "name": "Taman Greenwood",
+          "context": "Gombak"
+        },
+        {
+          "code": "098/17/03",
+          "name": "Simpang Tiga",
+          "context": "Gombak"
+        },
+        {
+          "code": "098/17/04",
+          "name": "Batu 8 Gombak",
+          "queries": [
+            "\"Batu 8\" Gombak"
+          ]
+        },
+        {
+          "code": "098/17/05",
+          "name": "Gombak Selatan"
+        },
+        {
+          "code": "098/17/06",
+          "name": "Gombak Setia",
+          "queries": []
+        },
+        {
+          "code": "098/17/07",
+          "name": "Sri Gombak 1",
+          "queries": []
+        },
+        {
+          "code": "098/17/08",
+          "name": "Sri Gombak 2–7",
+          "queries": []
+        },
+        {
+          "code": "098/17/09",
+          "name": "Taman Gombak"
+        },
+        {
+          "code": "098/17/10",
+          "name": "Batu 9 Gombak",
+          "queries": [
+            "\"Batu 9\" Gombak"
+          ]
+        },
+        {
+          "code": "098/17/11",
+          "name": "Taman Kamariah"
+        },
+        {
+          "code": "098/17/12",
+          "name": "Sri Gombak 10",
+          "queries": []
+        },
+        {
+          "code": "098/17/13",
+          "name": "Sri Gombak 8",
+          "queries": []
+        },
+        {
+          "code": "098/17/14",
+          "name": "Pinggiran Batu Caves"
+        },
+        {
+          "code": "098/17/15",
+          "name": "Taman Selaseh"
+        }
+      ]
+    },
+    {
+      "code": "098/18",
+      "name": "Hulu Kelang",
+      "aliases": [
+        "Ulu Kelang",
+        "Hulu Klang"
+      ],
+      "queries": [
+        "\"Hulu Kelang\" OR \"Ulu Kelang\" OR \"Hulu Klang\""
+      ],
+      "pdm": [
+        {
+          "code": "098/18/01",
+          "name": "Bandar Melawati"
+        },
+        {
+          "code": "098/18/02",
+          "name": "Kelang Gate"
+        },
+        {
+          "code": "098/18/03",
+          "name": "Taman Melawati"
+        },
+        {
+          "code": "098/18/04",
+          "name": "Kemensah"
+        },
+        {
+          "code": "098/18/05",
+          "name": "Hulu Kelang",
+          "queries": []
+        },
+        {
+          "code": "098/18/06",
+          "name": "Taman Permata",
+          "context": "Hulu Kelang OR Gombak OR Melawati"
+        },
+        {
+          "code": "098/18/07",
+          "name": "Keramat Tengah AU 4",
+          "queries": [
+            "\"Keramat AU\" OR \"Taman Keramat\" OR \"Keramat Pangsa\" OR \"Sri Keramat\""
+          ]
+        },
+        {
+          "code": "098/18/08",
+          "name": "AU3 Rumah Teres",
+          "queries": []
+        },
+        {
+          "code": "098/18/09",
+          "name": "Sri Keramat AU 2A",
+          "queries": []
+        },
+        {
+          "code": "098/18/10",
+          "name": "Keramat AU 1",
+          "queries": []
+        },
+        {
+          "code": "098/18/11",
+          "name": "Keramat Pangsa",
+          "queries": []
+        },
+        {
+          "code": "098/18/12",
+          "name": "Melawati Jalan F & H",
+          "queries": []
+        },
+        {
+          "code": "098/18/13",
+          "name": "AU 5C",
+          "queries": []
+        },
+        {
+          "code": "098/18/14",
+          "name": "Desa Keramat AU 2B & AU 2C",
+          "queries": []
+        },
+        {
+          "code": "098/18/15",
+          "name": "AU 5D",
+          "queries": []
+        },
+        {
+          "code": "098/18/16",
+          "name": "Keramat AU 1B",
+          "queries": []
+        },
+        {
+          "code": "098/18/17",
+          "name": "AU3 Rumah Pangsa",
+          "queries": []
+        },
+        {
+          "code": "098/18/18",
+          "name": "Melawati Jalan G.E.C",
+          "queries": []
+        },
+        {
+          "code": "098/18/19",
+          "name": "Enggang Utara",
+          "queries": [
+            "\"Enggang Utara\" OR \"Enggang Selatan\""
+          ]
+        },
+        {
+          "code": "098/18/20",
+          "name": "Enggang Selatan",
+          "queries": []
+        }
+      ]
+    }
+  ]
+}
