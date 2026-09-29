@@ -211,27 +211,58 @@ def entry_time(entry):
 
 
 def fetch_news(cfg):
+bash
+
+cat << 'PYEOF'
+def fetch_news(cfg):
+    import random
     import feedparser  # imported here so offline tests don't need it
 
     gn = cfg["google_news"]
     max_age = timedelta(days=cfg["max_age_days"])
     cutoff = datetime.now(timezone.utc) - max_age
     articles = {}
+    base_delay = cfg.get("request_delay_seconds", 3.0)
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                      "(KHTML, like Gecko) Chrome/124.0 Safari/537.36",
+        "Accept-Language": "ms-MY,ms;q=0.9,en-US;q=0.8,en;q=0.7",
+        "Referer": "https://news.google.com/",
+    }
 
     queries = build_queries(cfg)
     print(f"Mengambil berita: {len(queries)} carian")
+    blocked = 0
+
     for q in queries:
         url = (
             "https://news.google.com/rss/search?q="
             + quote_plus(f"{q} when:{cfg['max_age_days']}d")
             + f"&hl={gn['hl']}&gl={gn['gl']}&ceid={gn['ceid']}"
         )
-        try:
-            resp = requests.get(url, headers={"User-Agent": USER_AGENT}, timeout=20)
-            resp.raise_for_status()
-            feed = feedparser.parse(resp.content)
-        except Exception as e:
-            print(f"  ! gagal: {q} ({e})")
+        feed = None
+        for attempt in range(2):  # one retry after a longer cooldown on 429
+            try:
+                resp = requests.get(url, headers=headers, timeout=20)
+                if resp.status_code == 429:
+                    if attempt == 0:
+                        print(f"  ! 429 disekat: {q} (cuba semula dalam 20s)")
+                        time.sleep(20)
+                        continue
+                    print(f"  ! 429 disekat (kali kedua, dilangkau): {q}")
+                    blocked += 1
+                    break
+                resp.raise_for_status()
+                feed = feedparser.parse(resp.content)
+                break
+            except Exception as e:
+                print(f"  ! gagal: {q} ({e})")
+                break
+
+        # This now runs after EVERY query, success or failure, so we never burst.
+        time.sleep(base_delay + random.uniform(0, 1.5))
+
+        if feed is None:
             continue
 
         for entry in feed.entries[: cfg["per_query_limit"]]:
@@ -256,11 +287,97 @@ def fetch_news(cfg):
                 "snippet": clean_snippet(entry.get("summary", ""), title),
                 "title_key": key,
             }
-        time.sleep(cfg.get("request_delay_seconds", 1.0))
+
+    if blocked > len(queries) / 2:
+        print(f"AMARAN: {blocked}/{len(queries)} carian disekat oleh Google (429). "
+              f"Kemungkinan IP Railway disenarai hitam sementara oleh Google, bukan sebab kelajuan carian.")
 
     print(f"Jumpa {len(articles)} artikel unik")
     return list(articles.values())
+PYEOF
+Output
 
+def fetch_news(cfg):
+    
+    import random
+    import feedparser  # imported here so offline tests don't need it
+
+    gn = cfg["google_news"]
+    max_age = timedelta(days=cfg["max_age_days"])
+    cutoff = datetime.now(timezone.utc) - max_age
+    articles = {}
+    base_delay = cfg.get("request_delay_seconds", 3.0)
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                      "(KHTML, like Gecko) Chrome/124.0 Safari/537.36",
+        "Accept-Language": "ms-MY,ms;q=0.9,en-US;q=0.8,en;q=0.7",
+        "Referer": "https://news.google.com/",
+    }
+
+    queries = build_queries(cfg)
+    print(f"Mengambil berita: {len(queries)} carian")
+    blocked = 0
+
+    for q in queries:
+        url = (
+            "https://news.google.com/rss/search?q="
+            + quote_plus(f"{q} when:{cfg['max_age_days']}d")
+            + f"&hl={gn['hl']}&gl={gn['gl']}&ceid={gn['ceid']}"
+        )
+        feed = None
+        for attempt in range(2):  # one retry after a longer cooldown on 429
+            try:
+                resp = requests.get(url, headers=headers, timeout=20)
+                if resp.status_code == 429:
+                    if attempt == 0:
+                        print(f"  ! 429 disekat: {q} (cuba semula dalam 20s)")
+                        time.sleep(20)
+                        continue
+                    print(f"  ! 429 disekat (kali kedua, dilangkau): {q}")
+                    blocked += 1
+                    break
+                resp.raise_for_status()
+                feed = feedparser.parse(resp.content)
+                break
+            except Exception as e:
+                print(f"  ! gagal: {q} ({e})")
+                break
+
+        # This now runs after EVERY query, success or failure, so we never burst.
+        time.sleep(base_delay + random.uniform(0, 1.5))
+
+        if feed is None:
+            continue
+
+        for entry in feed.entries[: cfg["per_query_limit"]]:
+            title = (entry.get("title") or "").strip()
+            link = entry.get("link")
+            if not title or not link:
+                continue
+            source = (entry.get("source") or {}).get("title", "") if isinstance(entry.get("source"), dict) else ""
+            if source and title.endswith(f" - {source}"):
+                title = title[: -len(f" - {source}")].strip()
+            dt = entry_time(entry)
+            if dt and dt < cutoff:
+                continue
+            key = hashlib.sha1(norm_key(title).encode("utf-8")).hexdigest()[:16]
+            if link in articles or any(a["title_key"] == key for a in articles.values()):
+                continue
+            articles[link] = {
+                "title": title,
+                "link": link,
+                "source": source or "Sumber",
+                "published": dt.strftime("%Y-%m-%dT%H:%M:%S") if dt else "",
+                "snippet": clean_snippet(entry.get("summary", ""), title),
+                "title_key": key,
+            }
+
+    if blocked > len(queries) / 2:
+        print(f"AMARAN: {blocked}/{len(queries)} carian disekat oleh Google (429). "
+              f"Kemungkinan IP Railway disenarai hitam sementara oleh Google, bukan sebab kelajuan carian.")
+
+    print(f"Jumpa {len(articles)} artikel unik")
+    return list(articles.values())
 
 # --------------------------------------------------------------------------
 # Step 2: classify with Claude Haiku
