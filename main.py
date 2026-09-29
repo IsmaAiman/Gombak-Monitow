@@ -90,7 +90,7 @@ class Store:
             import psycopg2  # imported lazily so local runs don't need it
 
             self.pg = True
-            self.conn = psycopg2.connect(self.url)
+            self.conn = psycopg2.connect(self.url, connect_timeout=10)
         else:
             self.pg = False
             path = os.environ.get("SQLITE_PATH", os.path.join(HERE, "gombak.db"))
@@ -622,9 +622,9 @@ def main():
     parser.add_argument("--weekly", action="store_true", help="send the weekly coverage summary")
     args = parser.parse_args()
 
+    print(f"Gombak Monitor — {datetime.now(MYT):%d/%m/%Y %H:%M} MYT")
     cfg = load_config()
     store = Store()
-    print(f"Gombak Monitor \u2014 {datetime.now(MYT):%d/%m/%Y %H:%M} MYT")
 
     if args.weekly:
         messages = weekly_summary(cfg, store)
