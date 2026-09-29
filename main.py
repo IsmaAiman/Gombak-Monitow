@@ -209,10 +209,6 @@ def entry_time(entry):
         return datetime(*t[:6], tzinfo=timezone.utc)
     return None
 
-
-def fetch_news(cfg):
-
-cat << 'PYEOF'
 def fetch_news(cfg):
     import random
     import feedparser  # imported here so offline tests don't need it
