@@ -210,6 +210,9 @@ def entry_time(entry):
     return None
 
 def fetch_news(cfg):
+
+cat << 'PYEOF'
+
     import random
     import feedparser  # imported here so offline tests don't need it
 
