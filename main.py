@@ -211,7 +211,6 @@ def entry_time(entry):
 
 
 def fetch_news(cfg):
-bash
 
 cat << 'PYEOF'
 def fetch_news(cfg):
