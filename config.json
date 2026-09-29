@@ -12,7 +12,7 @@
   "per_query_limit": 10,
   "max_new_per_run": 120,
   "batch_size": 15,
-  "request_delay_seconds": 1.0,
+  "request_delay_seconds": 3.0,
   "send_empty_digest": false,
   "extra_queries": [
     "\"Parlimen Gombak\"",
