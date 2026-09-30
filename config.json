@@ -12,8 +12,8 @@
   "per_query_limit": 10,
   "max_new_per_run": 120,
   "batch_size": 15,
-  "request_delay_seconds": 3.0,
-  "send_empty_digest": false,
+  "request_delay_seconds": 1.0,
+  "send_empty_digest": true,
   "extra_queries": [
     "\"Parlimen Gombak\"",
     "\"Pejabat Daerah Gombak\"",
@@ -335,5 +335,38 @@
         }
       ]
     }
+  ],
+  "blocked_domains": [
+    "mudah.my",
+    "iproperty.com.my",
+    "propertyguru.com.my",
+    "ibilik.my",
+    "speedhome.com",
+    "ejen.my",
+    "rumah.com.my",
+    "roomz.asia",
+    "1millionjobs.com.my",
+    "jobstreet.com",
+    "maukerja.my",
+    "shopee.com.my",
+    "lelong.com.my",
+    "carousell.com.my",
+    "olx.com.my"
+  ],
+  "blocked_title_keywords": [
+    "untuk disewa",
+    "disewakan",
+    "nak disewa",
+    "rumah sewa",
+    "bilik sewa",
+    "untuk dijual",
+    "rumah dijual",
+    "for rent",
+    "for sale",
+    "to let",
+    "kerja kosong",
+    "jawatan kosong",
+    "job vacancy",
+    "hiring now"
   ]
 }
