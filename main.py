@@ -31,7 +31,7 @@ import sqlite3
 import sys
 import time
 from datetime import datetime, timedelta, timezone
-from urllib.parse import quote_plus
+from urllib.parse import quote_plus, urlparse
 
 import requests
 
@@ -210,6 +210,26 @@ def entry_time(entry):
     return None
 
 
+def domain_of(link):
+    try:
+        return urlparse(link).netloc.lower().lstrip("www.")
+    except Exception:
+        return ""
+
+
+def is_blocked(title, link, cfg):
+    """True if this looks like a classified ad / listing rather than news."""
+    dom = domain_of(link)
+    for blocked in cfg.get("blocked_domains", []):
+        if dom == blocked or dom.endswith("." + blocked):
+            return True
+    title_l = title.lower()
+    for kw in cfg.get("blocked_title_keywords", []):
+        if kw in title_l:
+            return True
+    return False
+
+
 def fetch_news(cfg):
     import feedparser  # imported here so offline tests don't need it
 
@@ -228,6 +248,7 @@ def fetch_news(cfg):
     queries = build_queries(cfg)
     print(f"Mengambil berita: {len(queries)} carian")
     blocked = 0
+    listing_blocked = 0
 
     for q in queries:
         url = (
@@ -271,6 +292,9 @@ def fetch_news(cfg):
             dt = entry_time(entry)
             if dt and dt < cutoff:
                 continue
+            if is_blocked(title, link, cfg):
+                listing_blocked += 1
+                continue
             key = hashlib.sha1(norm_key(title).encode("utf-8")).hexdigest()[:16]
             if link in articles or any(a["title_key"] == key for a in articles.values()):
                 continue
@@ -287,8 +311,10 @@ def fetch_news(cfg):
         print(f"AMARAN: {blocked}/{len(queries)} carian disekat oleh Google (429). "
               f"Kemungkinan IP Railway disenarai hitam sementara oleh Google, bukan sebab kelajuan carian.")
 
+    if listing_blocked:
+        print(f"{listing_blocked} disekat sebagai iklan/listing (bukan berita)")
     print(f"Jumpa {len(articles)} artikel unik")
-    return list(articles.values())
+    return list(articles.values()), listing_blocked
 
 
 # --------------------------------------------------------------------------
@@ -324,7 +350,7 @@ Kategori:
 
 Tugas: untuk setiap artikel, tentukan sama ada peristiwa, isu atau acara itu berlaku di lokasi dalam kawasan di atas.
 - Relevan: berita tentang acara, isu, projek atau insiden di lokasi dalam kawasan (termasuk acara besar seperti perayaan di Batu Caves).
-- Tidak relevan: berita nasional atau tempat lain yang hanya menyebut nama tempat tanpa kaitan lokasi kejadian, atau nama yang sama tetapi di kawasan lain.
+- Tidak relevan: berita nasional atau tempat lain yang hanya menyebut nama tempat tanpa kaitan lokasi kejadian, atau nama yang sama tetapi di kawasan lain. Juga TIDAK relevan: iklan hartanah (rumah/bilik untuk disewa atau dijual), iklan pekerjaan/kerja kosong, direktori perniagaan, dan apa-apa promosi komersial yang tidak berkaitan aktiviti komuniti atau wakil rakyat.
 - Jika relevan tetapi lokasi tepat tidak jelas, letakkan "dun" dan "pdm" sebagai null.
 - Ringkasan berdasarkan tajuk dan petikan yang diberi sahaja. Jangan reka butiran. Nada neutral, fakta sahaja, tanpa pendapat.
 
@@ -530,6 +556,23 @@ def weekly_summary(cfg, store):
     return ["\n".join(lines)]
 
 
+def build_no_update_message(scanned, duplicates, checked, blocked):
+    now = datetime.now(MYT).strftime("%d/%m/%Y %H:%M")
+    detail_bits = [f"{scanned} artikel diimbas"]
+    if duplicates:
+        detail_bits.append(f"{duplicates} ulangan")
+    if blocked:
+        detail_bits.append(f"{blocked} iklan/listing ditapis")
+    if checked:
+        detail_bits.append(f"{checked} disemak tetapi tiada berkaitan")
+    detail = ", ".join(detail_bits)
+    return (
+        f"\U0001F4CD <b>Pantau Gombak</b> \u2014 {now}\n"
+        f"Tiada berita baharu berkaitan Gombak hari ini.\n"
+        f"<i>({detail})</i>"
+    )
+
+
 # --------------------------------------------------------------------------
 # Entry point
 # --------------------------------------------------------------------------
@@ -551,16 +594,27 @@ def main():
             send_telegram(messages)
         return
 
-    articles = fetch_news(cfg)
+    articles, listing_blocked = fetch_news(cfg)
     new = [a for a in articles if not store.known(a["link"], a["title_key"])]
+    duplicates = len(articles) - len(new)
     new = new[: cfg["max_new_per_run"]]
-    print(f"{len(new)} artikel baharu untuk ditapis")
+    print(f"{duplicates} sudah pernah dilihat sebelum ini, {len(new)} artikel baharu untuk ditapis")
     if new:
         classify_and_store(cfg, store, new)
 
     rows = store.unsent()
-    if not rows and not cfg.get("send_empty_digest"):
-        print("Tiada item berkaitan yang baharu.")
+    if not rows:
+        if not cfg.get("send_empty_digest", True):
+            print("Tiada item berkaitan yang baharu.")
+            return
+        notice = build_no_update_message(len(articles), duplicates, len(new), listing_blocked)
+        if args.dry_run:
+            print(notice)
+            return
+        if send_telegram([notice]):
+            print("Notis 'tiada kemaskini' dihantar.")
+        else:
+            print("Notis 'tiada kemaskini' gagal dihantar.")
         return
 
     messages = build_digest(rows, cfg)
